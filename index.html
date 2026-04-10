@@ -3,134 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Boutique de Linogravures</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Boutique Linogravures</title>
     <style>
-        :root {
-            --tg-bg: var(--tg-theme-bg-color, #ffffff);
-            --tg-text: var(--tg-theme-text-color, #222222);
-            --tg-hint: var(--tg-theme-hint-color, #999999);
-            --tg-link: var(--tg-theme-link-color, #248bcf);
-            --tg-primary: var(--tg-theme-button-color, #248bcf);
-            --tg-primary-text: var(--tg-theme-button-text-color, #ffffff);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-bg);
-            color: var(--tg-text);
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 15px; 
+            background-color: #f4f4f4; 
             margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
-
-        h1 { font-size: 1.5rem; margin-bottom: 20px; }
-
-        .card {
-            background: rgba(0,0,0,0.05);
-            border-radius: 12px;
+        .produit { 
+            background: white; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        .produit h2 { 
+            margin-top: 0; 
+            font-size: 18px; 
+            color: #333;
+        }
+        .produit p { 
+            color: #666; 
+            font-size: 16px;
+        }
+        .btn-ajouter { 
+            background-color: #0088cc; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            width: 100%; 
+            font-size: 16px; 
+            font-weight: bold;
+        }
+        #mon-panier { 
+            background: white; 
+            padding: 15px; 
+            margin-top: 25px; 
+            border-radius: 10px; 
+            border: 2px solid #ddd; 
+        }
+        #btn-payer { 
+            background: #28a745; 
+            color: white;
+            border: none;
             padding: 15px;
             width: 100%;
-            max-width: 300px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .card img {
-            width: 100%;
             border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .price { font-weight: bold; font-size: 1.2rem; color: var(--tg-link); }
-
-        .btn {
-            background-color: var(--tg-primary);
-            color: var(--tg-primary-text);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            width: 100%;
+            font-size: 18px;
             font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
+            display: none; /* Caché au début */
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Mes Linogravures</h1>
+    <h1 style="text-align: center;">🎨 Mes Linogravures</h1>
 
-    <div class="card">
-        <img src="https://via.placeholder.com/300x400" alt="Lino 1">
-        <h3>L'Envol Sauvage</h3>
-        <p class="price">35,00 €</p>
-        <button class="btn" onclick="buyItem('L\'Envol Sauvage', 3500)">Ajouter au panier</button>
+    <div class="produit">
+        <h2>Linogravure Ectoplasma</h2>
+        <p>Prix : 10.00 €</p>
+        <button class="btn-ajouter" onclick="addToCart('Linogravure Ectoplasma', 1000)">Ajouter au panier</button>
     </div>
 
+    <div class="produit">
+        <h2>Linogravure Psykokwak</h2>
+        <p>Prix : 10.00 €</p>
+        <button class="btn-ajouter" onclick="addToCart('Linogravure Psykokwak', 1000)">Ajouter au panier</button>
+    </div>
+
+    <div id="mon-panier">
+        <h3 style="margin-top:0;">🛒 Mon Panier</h3>
+        <ul id="liste-panier" style="padding-left: 20px; color: #444;">
+            <li style="list-style-type: none; margin-left: -20px;">Le panier est vide.</li>
+        </ul>
+        <p style="font-size: 18px;"><strong>Total : <span id="total-panier">0.00</span> €</strong></p>
+        <button id="btn-payer" onclick="validerCommande()">💳 Payer la commande</button>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Ouvre la fenêtre en grand immédiatement
+        tg.expand(); // Ouvre la fenêtre en grand sur le téléphone
+        
+        let panier = [];
+        let totalCentimes = 0;
 
-        function buyItem(name, price) {
-            // On envoie les infos au bot
-            const data = {
-                product: name,
-                price_cents: price
-            };
-            tg.sendData(JSON.stringify(data));
-            // La fenêtre se fermera automatiquement après l'envoi
+        // Fonction quand on clique sur "Ajouter au panier"
+        function addToCart(nom, prix) {
+            panier.push({ label: nom, amount: prix });
+            totalCentimes += prix;
+            mettreAJourAffichage();
+            
+            // Fait une petite vibration sur le téléphone si c'est supporté
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
         }
-    </script><div id="mon-panier" style="background: #f9f9f9; padding: 15px; margin-top: 20px; border-radius: 8px; border: 1px solid #ddd;">
-    <h3>🛒 Mon Panier</h3>
-    <ul id="liste-panier"></ul>
-    <p><strong>Total : <span id="total-panier">0</span> €</strong></p>
-    <button id="btn-payer" onclick="validerCommande()" style="display:none; background: #28a745; color: white; padding: 10px; width: 100%; border: none; border-radius: 5px; font-size: 16px;">💳 Payer la commande</button>
-</div>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    
-    let panier = [];
-    let totalCentimes = 0;
-
-    // Fonction pour ajouter au panier
-    function addToCart(nom, prix) {
-        // On ajoute l'objet dans la liste (label et amount sont les mots exacts attendus par Telegram)
-        panier.push({ label: nom, amount: prix });
-        totalCentimes += prix;
-        mettreAJourAffichage();
-    }
-
-    // Fonction pour mettre à jour le visuel
-    function mettreAJourAffichage() {
-        const liste = document.getElementById("liste-panier");
-        liste.innerHTML = ""; // On vide la liste visuelle
-        
-        panier.forEach(item => {
-            let li = document.createElement("li");
-            li.innerText = item.label + " - " + (item.amount / 100) + " €";
-            liste.appendChild(li);
-        });
-        
-        document.getElementById("total-panier").innerText = (totalCentimes / 100).toFixed(2);
-        
-        // On affiche le bouton payer s'il y a des articles
-        if (panier.length > 0) {
-            document.getElementById("btn-payer").style.display = "block";
+        // Fonction qui met à jour le texte du panier
+        function mettreAJourAffichage() {
+            const liste = document.getElementById("liste-panier");
+            liste.innerHTML = ""; // On vide la liste
+            
+            panier.forEach(item => {
+                let li = document.createElement("li");
+                li.innerText = item.label + " - " + (item.amount / 100).toFixed(2) + " €";
+                liste.appendChild(li);
+            });
+            
+            // Mise à jour du prix total
+            document.getElementById("total-panier").innerText = (totalCentimes / 100).toFixed(2);
+            
+            // On affiche le bouton "Payer" vu qu'il y a des articles
+            if (panier.length > 0) {
+                document.getElementById("btn-payer").style.display = "block";
+            }
         }
-    }
 
-    // Fonction pour envoyer le panier au Bot
-    function validerCommande() {
-        // On envoie tout le tableau au format texte
-        tg.sendData(JSON.stringify({ articles: panier }));
-    }
-</script>
-    
+        // Fonction qui envoie la liste au bot quand on clique sur "Payer"
+        function validerCommande() {
+            tg.sendData(JSON.stringify({ articles: panier }));
+        }
+    </script>
 </body>
 </html>
