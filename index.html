@@ -1,51 +1,39 @@
-<div id="mon-panier" style="background: #f9f9f9; padding: 15px; margin-top: 20px; border-radius: 8px; border: 1px solid #ddd;">
-    <h3>🛒 Mon Panier</h3>
-    <ul id="liste-panier"></ul>
-    <p><strong>Total : <span id="total-panier">0</span> €</strong></p>
-    <button id="btn-payer" onclick="validerCommande()" style="display:none; background: #28a745; color: white; padding: 10px; width: 100%; border: none; border-radius: 5px; font-size: 16px;">💳 Payer la commande</button>
-</div>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    
-    let panier = [];
-    let totalCentimes = 0;
-
-    // Fonction pour ajouter au panier
-    function addToCart(nom, prix) {
-        // On ajoute l'objet dans la liste (label et amount sont les mots exacts attendus par Telegram)
-        panier.push({ label: nom, amount: prix });
-        totalCentimes += prix;
-        mettreAJourAffichage();
-    }
-
-    // Fonction pour mettre à jour le visuel
-    function mettreAJourAffichage() {
-        const liste = document.getElementById("liste-panier");
-        liste.innerHTML = ""; // On vide la liste visuelle
-        
-        panier.forEach(item => {
-            let li = document.createElement("li");
-            li.innerText = item.label + " - " + (item.amount / 100) + " €";
-            liste.appendChild(li);
-        });
-        
-        document.getElementById("total-panier").innerText = (totalCentimes / 100).toFixed(2);
-        
-        // On affiche le bouton payer s'il y a des articles
-        if (panier.length > 0) {
-            document.getElementById("btn-payer").style.display = "block";
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Boutique de Linogravures</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-bg: var(--tg-theme-bg-color, #ffffff);
+            --tg-text: var(--tg-theme-text-color, #222222);
+            --tg-hint: var(--tg-theme-hint-color, #999999);
+            --tg-link: var(--tg-theme-link-color, #248bcf);
+            --tg-primary: var(--tg-theme-button-color, #248bcf);
+            --tg-primary-text: var(--tg-theme-button-text-color, #ffffff);
         }
-    }
 
-    // Fonction pour envoyer le panier au Bot
-    function validerCommande() {
-        // On envoie tout le tableau au format texte
-        tg.sendData(JSON.stringify({ articles: panier }));
-    }
-</script>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-bg);
+            color: var(--tg-text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { font-size: 1.5rem; margin-bottom: 20px; }
+
+        .card {
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            max-width: 300px;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -95,6 +83,54 @@
             tg.sendData(JSON.stringify(data));
             // La fenêtre se fermera automatiquement après l'envoi
         }
-    </script>
+    </script><div id="mon-panier" style="background: #f9f9f9; padding: 15px; margin-top: 20px; border-radius: 8px; border: 1px solid #ddd;">
+    <h3>🛒 Mon Panier</h3>
+    <ul id="liste-panier"></ul>
+    <p><strong>Total : <span id="total-panier">0</span> €</strong></p>
+    <button id="btn-payer" onclick="validerCommande()" style="display:none; background: #28a745; color: white; padding: 10px; width: 100%; border: none; border-radius: 5px; font-size: 16px;">💳 Payer la commande</button>
+</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    
+    let panier = [];
+    let totalCentimes = 0;
+
+    // Fonction pour ajouter au panier
+    function addToCart(nom, prix) {
+        // On ajoute l'objet dans la liste (label et amount sont les mots exacts attendus par Telegram)
+        panier.push({ label: nom, amount: prix });
+        totalCentimes += prix;
+        mettreAJourAffichage();
+    }
+
+    // Fonction pour mettre à jour le visuel
+    function mettreAJourAffichage() {
+        const liste = document.getElementById("liste-panier");
+        liste.innerHTML = ""; // On vide la liste visuelle
+        
+        panier.forEach(item => {
+            let li = document.createElement("li");
+            li.innerText = item.label + " - " + (item.amount / 100) + " €";
+            liste.appendChild(li);
+        });
+        
+        document.getElementById("total-panier").innerText = (totalCentimes / 100).toFixed(2);
+        
+        // On affiche le bouton payer s'il y a des articles
+        if (panier.length > 0) {
+            document.getElementById("btn-payer").style.display = "block";
+        }
+    }
+
+    // Fonction pour envoyer le panier au Bot
+    function validerCommande() {
+        // On envoie tout le tableau au format texte
+        tg.sendData(JSON.stringify({ articles: panier }));
+    }
+</script>
+    
 </body>
 </html>
